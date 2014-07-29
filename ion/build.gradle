@@ -17,7 +17,24 @@ repositories {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:21.+'
+    def supportv4Project = ':support-v4'
+
+    def useLocalV4 = false
+    allprojects {
+        rootProject.allprojects.project.each {
+            if (it.path == ':support-v4') {
+                println 'Using local support-v4 library in ' + project.path
+                useLocalV4 = true
+            }
+        }
+    }
+
+    if (useLocalV4) {
+        compile project(supportv4Project)
+    } else {
+        compile 'com.android.support:support-v4:20.+'
+    }
+
     compile project(':AndroidAsync:AndroidAsync')
     compile 'com.google.code.gson:gson:2.3'
 }
