@@ -3,5 +3,7 @@
           package="com.koushikdutta.ion"
           android:versionCode="140"
           android:versionName="1.4.0">
+    <uses-sdk
+            tools:node="replace" android:minSdkVersion="4" android:targetSdkVersion="19"/>
     <application />
 </manifest>
