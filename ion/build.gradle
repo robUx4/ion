@@ -35,7 +35,7 @@ dependencies {
 
     if (useLocalAndroidAsync) {
         println 'Using local AndroidAsync library in ' + project.path
-        compile project(useLocalAndroidAsync)
+        compile project(androidasyncProject)
     } else {
         compile 'com.koushikdutta.async:androidasync:1.3.+'
     }
