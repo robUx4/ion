@@ -83,7 +83,6 @@ class IonRequestBuilder implements Builders.Any.B, Builders.Any.F, Builders.Any.
     Handler handler = Ion.mainHandler;
     String method = AsyncHttpGet.METHOD;
     String uri;
-    Object httpRequestCookie;
 
     public IonRequestBuilder(ContextReference contextReference, Ion ion) {
         String alive = contextReference.isAlive();
@@ -111,11 +110,6 @@ class IonRequestBuilder implements Builders.Any.B, Builders.Any.F, Builders.Any.
     public IonRequestBuilder load(String method, String url) {
         methodWasSet = true;
         return loadInternal(method, url);
-    }
-
-    @Override
-    public void setHttpRequestCookie(Object httpRequestCookie) {
-        this.httpRequestCookie = httpRequestCookie;
     }
 
     RawHeaders headers;
@@ -281,7 +275,7 @@ class IonRequestBuilder implements Builders.Any.B, Builders.Any.F, Builders.Any.
     }
 
     private AsyncHttpRequest prepareRequest(Uri uri, AsyncHttpRequestBody wrappedBody) {
-        AsyncHttpRequest request = ion.configure().getAsyncHttpRequestFactory().createAsyncHttpRequest(uri, method, headers, httpRequestCookie);
+        AsyncHttpRequest request = ion.configure().getAsyncHttpRequestFactory().createAsyncHttpRequest(uri, method, headers);
         request.setFollowRedirect(followRedirect);
         request.setBody(wrappedBody);
         request.setLogging(ion.logtag, ion.logLevel);
