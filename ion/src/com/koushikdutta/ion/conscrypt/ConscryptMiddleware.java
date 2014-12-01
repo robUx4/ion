@@ -7,6 +7,7 @@ import com.koushikdutta.async.future.Cancellable;
 import com.koushikdutta.async.http.AsyncSSLSocketMiddleware;
 import com.koushikdutta.async.http.SimpleMiddleware;
 
+import java.lang.reflect.Method;
 import java.security.Provider;
 import java.security.Security;
 
