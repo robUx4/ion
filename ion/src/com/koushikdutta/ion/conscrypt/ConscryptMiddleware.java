@@ -46,12 +46,19 @@ public class ConscryptMiddleware extends SimpleMiddleware {
 
                 SSLContext originalDefaultContext = SSLContext.getDefault();
                 SSLSocketFactory originalDefaultSSLSocketFactory = HttpsURLConnection.getDefaultSSLSocketFactory();
-                Context gms = context.createPackageContext("com.google.android.gms", Context.CONTEXT_INCLUDE_CODE | Context.CONTEXT_IGNORE_SECURITY);
-                gms
-                .getClassLoader()
-                .loadClass("com.google.android.gms.common.security.ProviderInstallerImpl")
-                .getMethod("insertProvider", Context.class)
-                .invoke(null, context);
+                try {
+                    Class<?> providerInstaller = Class.forName("com.google.android.gms.security.ProviderInstaller");
+                    Method mInsertProvider = providerInstaller.getDeclaredMethod("installIfNeeded", Context.class);
+                    mInsertProvider.invoke(null, context);
+
+                } catch (Throwable ignored) {
+                    Context gms = context.createPackageContext("com.google.android.gms", Context.CONTEXT_INCLUDE_CODE | Context.CONTEXT_IGNORE_SECURITY);
+                    gms
+                    .getClassLoader()
+                    .loadClass("com.google.android.gms.common.security.ProviderInstallerImpl")
+                    .getMethod("insertProvider", Context.class)
+                    .invoke(null, context);
+                }
 
                 Provider[] providers = Security.getProviders();
                 Provider provider = Security.getProvider(GMS_PROVIDER);
