@@ -18,7 +18,7 @@ repositories {
 
 dependencies {
     def supportv4Project = ':support-v4'
-    def androidasyncProject = 'AndroidAsync:AndroidAsync'
+    def androidasyncProject = ':AndroidAsync:AndroidAsync'
 
     def useLocalV4 = false
     def useLocalAndroidAsync = false
@@ -44,7 +44,7 @@ dependencies {
         println 'Using local support-v4 library in ' + project.path
         compile project(supportv4Project)
     } else {
-        compile 'com.android.support:support-v4:20.+'
+        compile 'com.android.support:support-v4:21.+'
     }
 
     compile 'com.google.code.gson:gson:2.3'
