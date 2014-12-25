@@ -1,6 +1,5 @@
 package com.koushikdutta.ion.builder;
 
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.view.animation.Animation;
 
@@ -73,17 +72,17 @@ public interface ImageViewBuilder<I extends ImageViewBuilder<?>> {
     public I animateLoad(int animationResource);
 
     /**
-     * Disable fadeIn when the image loads.
+     * Configure the fadeIn when the image loads.
      * @return
      */
-    public I disableFadeIn();
+    public I fadeIn(boolean fadeIn);
 
     /**
      * Flag to enable or disable animation of GIFs
-     * @param animateGif
+     * @param mode
      * @return
      */
-    public I animateGif(boolean animateGif);
+    public I animateGif(AnimateGifMode mode);
 
     /**
      * Load the ImageView with a deep zoomable image. This allows extremely large images
@@ -98,5 +97,5 @@ public interface ImageViewBuilder<I extends ImageViewBuilder<?>> {
      * Crossfade the new image with the existing image.
      * @return
      */
-    public I crossfade();
+    public I crossfade(boolean crossfade);
 }

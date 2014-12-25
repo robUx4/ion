@@ -24,6 +24,7 @@
    * [application/x-www-form-urlencoded](https://github.com/koush/ion#post-applicationx-www-form-urlencoded-and-read-a-string)
    * [multipart/form-data](https://github.com/koush/ion#post-multipartform-data-and-read-json-with-an-upload-progress-bar)
  * Transparent usage of HTTP features and optimizations:
+   * SPDY and HTTP/2
    * Caching
    * Gzip/Deflate Compression
    * Connection pooling/reuse via HTTP Connection: keep-alive
@@ -367,22 +368,22 @@ Ion.with(getContext())
 #### Get Ion
 
 ##### Jars
- * [androidasync.jar](http://repository.sonatype.org/service/local/artifact/maven/redirect?r=central-proxy&g=com.koushikdutta.async&a=androidasync&v=LATEST) (dependency)
- * [ion.jar](http://repository.sonatype.org/service/local/artifact/maven/redirect?r=central-proxy&g=com.koushikdutta.ion&a=ion&v=LATEST)
+ * [androidasync.jar](https://search.maven.org/remote_content?g=com.koushikdutta.async&a=androidasync&v=LATEST) (dependency)
+ * [ion.jar](https://search.maven.org/remote_content?g=com.koushikdutta.ion&a=ion&v=LATEST)
 
 ##### Maven
 ```xml
 <dependency>
    <groupId>com.koushikdutta.ion</groupId>
    <artifactId>ion</artifactId>
-   <version>1,</version>
+   <version>2,</version>
 </dependency>
 ```
 
 ##### Gradle
 ```groovy
 dependencies {
-    compile 'com.koushikdutta.ion:ion:1.+'
+    compile 'com.koushikdutta.ion:ion:2.+'
 }
 ````
 
@@ -403,7 +404,7 @@ git clone git://github.com/koush/AndroidAsync.git
 git clone git://github.com/koush/ion.git
 ```
 * Import the project from AndroidAsync/AndroidAsync into your workspace
-* Import all the ion projects (ion/ion, ion/ion-test, ion/ion-sample) into your workspace.
+* Import all the ion projects (ion/ion, ion/ion-sample) into your workspace.
 
 #### Projects using ion
 

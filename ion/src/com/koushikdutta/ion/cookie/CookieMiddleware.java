@@ -5,8 +5,9 @@ import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.koushikdutta.async.http.Headers;
 import com.koushikdutta.async.http.SimpleMiddleware;
-import com.koushikdutta.async.http.libcore.RawHeaders;
+import com.koushikdutta.ion.Ion;
 
 import java.net.CookieManager;
 import java.net.CookieStore;
@@ -27,39 +28,41 @@ public class CookieMiddleware extends SimpleMiddleware {
     }
 
     public void clear() {
+        maybeInit();
         getCookieStore().removeAll();
-        preferences.edit().clear().commit();
+        preferences.edit().clear().apply();
     }
 
     public CookieManager getCookieManager() {
+        maybeInit();
         return manager;
     }
 
-    public CookieMiddleware(Context context, String name) {
-        reinit(context, name);
+    Ion ion;
+    public CookieMiddleware(Ion ion) {
+        this.ion = ion;
     }
 
-    public void reinit(Context context, String name) {
+    public void reinit() {
         manager = new CookieManager(null, null);
-        preferences = context.getSharedPreferences(name + "-cookies", Context.MODE_PRIVATE);
+        preferences = ion.getContext().getSharedPreferences(ion.getName() + "-cookies", Context.MODE_PRIVATE);
 
         Map<String, ?> allPrefs = preferences.getAll();
         for (String key: allPrefs.keySet()) {
             try {
                 String value = preferences.getString(key, null);
-                RawHeaders headers = new RawHeaders();
+                Headers headers = new Headers();
                 String[] lines = value.split("\n");
                 boolean first = true;
                 for (String line: lines) {
                     if (first) {
                         first = false;
-                        headers.setStatusLine(line);
                     }
                     else if (!TextUtils.isEmpty(line)) {
                         headers.addLine(line);
                     }
                 }
-                manager.put(URI.create(key), headers.toMultimap());
+                manager.put(URI.create(key), headers.getMultiMap());
             }
             catch (Exception e) {
                 Log.e("Ion", "unable to load cookies", e);
@@ -67,28 +70,48 @@ public class CookieMiddleware extends SimpleMiddleware {
         }
     }
 
+    public static void addCookies(Map<String, List<String>> allCookieHeaders, Headers headers) {
+        for (Map.Entry<String, List<String>> entry : allCookieHeaders.entrySet()) {
+            String key = entry.getKey();
+            if ("Cookie".equalsIgnoreCase(key) || "Cookie2".equalsIgnoreCase(key)) {
+                headers.addAll(key, entry.getValue());
+            }
+        }
+    }
+
+    private void maybeInit() {
+        if (manager == null)
+            reinit();
+    }
+
     @Override
-    public void onSocket(OnSocketData data) {
+    public void onRequest(OnRequestData data) {
+        maybeInit();
         try {
-            Map<String, List<String>> cookies = manager.get(URI.create(data.request.getUri().toString()), data.request.getHeaders().getHeaders().toMultimap());
-            data.request.getHeaders().addCookies(cookies);
+            Map<String, List<String>> cookies = manager.get(
+                URI.create(
+                    data.request.getUri().toString()),
+                    data.request.getHeaders().getMultiMap());
+            addCookies(cookies, data.request.getHeaders());
         }
         catch (Exception e) {
         }
     }
 
     @Override
-    public void onHeadersReceived(OnHeadersReceivedData data) {
+    public void onHeadersReceived(OnHeadersReceivedDataOnRequestSentData data) {
+        maybeInit();
         try {
-            put(URI.create(data.request.getUri().toString()), data.headers.getHeaders());
+            put(URI.create(data.request.getUri().toString()), data.response.headers());
         }
         catch (Exception e) {
         }
     }
 
-    public void put(URI uri, RawHeaders headers) {
+    public void put(URI uri, Headers headers) {
+        maybeInit();
         try {
-            manager.put(uri, headers.toMultimap());
+            manager.put(uri, headers.getMultiMap());
 
             // no cookies to persist.
             if (headers.get("Set-Cookie") == null)
@@ -96,14 +119,13 @@ public class CookieMiddleware extends SimpleMiddleware {
 
             List<HttpCookie> cookies = manager.getCookieStore().get(uri);
 
-            RawHeaders dump = new RawHeaders();
-            dump.setStatusLine("HTTP/1.1 200 OK");
+            Headers dump = new Headers();
             for (HttpCookie cookie: cookies) {
                 dump.add("Set-Cookie", cookie.getName() + "=" + cookie.getValue());
             }
 
             String key = uri.getScheme() + "://" + uri.getAuthority();
-            preferences.edit().putString(key, dump.toHeaderString()).commit();
+            preferences.edit().putString(key, dump.toPrefixString("HTTP/1.1 200 OK")).commit();
         }
         catch (Exception e) {
         }

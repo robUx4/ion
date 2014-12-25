@@ -39,14 +39,13 @@ public class GoogleImageSearch extends Activity {
                 loadMore();
 
             if (convertView == null)
-                convertView = getLayoutInflater().inflate(R.layout.google_image, null);
+                convertView = getLayoutInflater().inflate(R.layout.image, null);
 
             // find the image view
             final ImageView iv = (ImageView) convertView.findViewById(R.id.image);
 
             // select the image view
             Ion.with(iv)
-            .resize(256, 256)
             .centerCrop()
             .placeholder(R.drawable.placeholder)
             .error(R.drawable.error)

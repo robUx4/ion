@@ -5,13 +5,18 @@ import android.test.AndroidTestCase;
 import android.util.Base64;
 import android.util.Log;
 
+import com.google.gson.JsonObject;
 import com.koushikdutta.async.AsyncServer;
 import com.koushikdutta.async.AsyncServerSocket;
 import com.koushikdutta.async.AsyncSocket;
+import com.koushikdutta.async.ByteBufferList;
 import com.koushikdutta.async.Util;
 import com.koushikdutta.async.callback.CompletedCallback;
 import com.koushikdutta.async.callback.ListenCallback;
+import com.koushikdutta.async.future.Future;
 import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.async.http.AsyncHttpClient;
+import com.koushikdutta.async.http.AsyncHttpGet;
 import com.koushikdutta.async.http.body.UrlEncodedFormBody;
 import com.koushikdutta.async.http.server.AsyncHttpServer;
 import com.koushikdutta.async.http.server.AsyncHttpServerRequest;
@@ -19,6 +24,7 @@ import com.koushikdutta.async.http.server.AsyncHttpServerResponse;
 import com.koushikdutta.async.http.server.HttpServerRequestCallback;
 import com.koushikdutta.async.util.StreamUtility;
 import com.koushikdutta.ion.Ion;
+import com.koushikdutta.ion.Response;
 
 import java.io.File;
 import java.util.Arrays;
@@ -33,11 +39,43 @@ import java.util.concurrent.TimeUnit;
  */
 public class Issues extends AndroidTestCase {
     public void testIssue74() throws Exception {
-        String data = Ion.with(getContext(), "https://raw.github.com/koush/AndroidAsync/master/AndroidAsyncTest/testdata/test.json")
+        String data = Ion.with(getContext()).load("https://raw.github.com/koush/AndroidAsync/master/AndroidAsyncTest/testdata/test.json")
         .setLogging("MyLogs", Log.VERBOSE)
         .asString().get();
 
-        String data2 = Ion.with(getContext(), "https://raw.github.com/koush/AndroidAsync/master/AndroidAsyncTest/testdata/test.json")
+        String data2 = Ion.with(getContext()).load("https://raw.github.com/koush/AndroidAsync/master/AndroidAsyncTest/testdata/test.json")
+        .setLogging("MyLogs", Log.VERBOSE)
+        .asString().get();
+
+        assertEquals(data, data2);
+    }
+
+    public void testSpdyReuse() throws Exception {
+        String data = Ion.with(getContext()).load("https://raw.github.com/koush/AndroidAsync/master/AndroidAsyncTest/testdata/test.json")
+        .setLogging("MyLogs", Log.VERBOSE)
+        .asString().get();
+
+        String data2 = Ion.with(getContext()).load("https://raw.github.com/koush/AndroidAsync/master/AndroidAsyncTest/testdata/test.json")
+        .setLogging("MyLogs", Log.VERBOSE)
+        .asString().get();
+
+        Ion.with(getContext()).load("https://raw.github.com/koush/AndroidAsync/master/AndroidAsyncTest/testdata/test.json")
+        .setLogging("MyLogs", Log.VERBOSE)
+        .asString().get();
+
+        Ion.with(getContext()).load("https://raw.github.com/koush/AndroidAsync/master/AndroidAsyncTest/testdata/test.json")
+        .setLogging("MyLogs", Log.VERBOSE)
+        .asString().get();
+
+        Ion.with(getContext()).load("https://raw.github.com/koush/AndroidAsync/master/AndroidAsyncTest/testdata/test.json")
+        .setLogging("MyLogs", Log.VERBOSE)
+        .asString().get();
+
+        Ion.with(getContext()).load("https://raw.github.com/koush/AndroidAsync/master/AndroidAsyncTest/testdata/test.json")
+        .setLogging("MyLogs", Log.VERBOSE)
+        .asString().get();
+
+        Ion.with(getContext()).load("https://raw.github.com/koush/AndroidAsync/master/AndroidAsyncTest/testdata/test.json")
         .setLogging("MyLogs", Log.VERBOSE)
         .asString().get();
 
@@ -60,7 +98,7 @@ public class Issues extends AndroidTestCase {
         httpServer.get("/", new HttpServerRequestCallback() {
             @Override
             public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
-                response.getHeaders().getHeaders().set("Cache-Control", "max-age=300");
+                response.getHeaders().set("Cache-Control", "max-age=300");
                 response.send(request.getQuery().size() + "");
             }
         });
@@ -134,7 +172,7 @@ public class Issues extends AndroidTestCase {
         String b64 = Base64.encodeToString(random, 0);
 
         String uploadUrl = Ion.with(getContext())
-        .load("http://ion-test.appspot.com/upload_url")
+        .load("https://ion-test.appspot.com/upload_url")
         .asString()
         .get();
 
@@ -248,5 +286,22 @@ public class Issues extends AndroidTestCase {
         finally {
             asyncServer.stop();
         }
+    }
+
+    public void testAAIssue225() throws Exception {
+        String ret = Ion.with(getContext())
+        .load("https://content.fastrbooks.com/android-test.txt")
+        .noCache()
+        .asString()
+        .get();
+
+        System.out.println(ret);
+    }
+
+    public void testIon428() throws Exception {
+        Ion.with(getContext())
+        .load("https://cdn2.vox-cdn.com/thumbor/KxtZNw37jKNfxdA0hX5edHvbTBE=/0x0:2039x1359/800x536/cdn0.vox-cdn.com/uploads/chorus_image/image/44254028/lg-g-watch.0.0.jpg")
+        .asString()
+        .get();
     }
 }
